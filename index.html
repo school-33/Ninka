@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="icon.jpg" />
+    <title>Нинка</title>
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+      }
+      body {
+        background-color: #f7f7f7;
+      }
+
+      .game {
+        width: 500px; /* уменьшаем в 2 раза */
+        height: 225px; /* уменьшаем в 2 раза */
+        border: 1px solid #000000;
+        margin: auto; /* Добавляем автоматическое выравнивание по центру */
+        position: absolute; /* Переключаем на абсолютное позиционирование */
+        top: 50%; /* Перемещаем блок на 50% относительно верха */
+        left: 50%; /* Перемещаем блок на 50% относительно левого края */
+        transform: translate(-50%, -50%); /* Возвращаем блок в центр экрана */
+        background-image: url("desert.png");
+        background-size: 100% 100%;
+      }
+
+      #dino {
+        width: 110px; /* уменьшаем в 2 раза */
+        height: 150px; /* уменьшаем в 2 раза */
+        background-image: url("dino.png");
+        background-size: 110px 150px;
+        position: absolute;
+        bottom: 0;
+        left: 216px; /* уменьшаем в 2 раза */
+        transition: bottom 0.1s;
+        animation: dino-block 0.3s; /* уменьшаем в 2 раза */
+        animation-iteration-count: 1;
+        animation-fill-mode: forwards;
+      }
+
+      #cactus {
+        width: 55px; /* уменьшаем в 2 раза */
+        height: 57.5px; /* уменьшаем в 2 раза */
+        position: absolute;
+        bottom: 0;
+        left: 455px; /* уменьшаем в 2 раза */
+        background-image: url("cactus.png");
+        background-size: 55px 57.5px; /* уменьшаем в 2 раза */
+        animation: none;
+      }
+
+      #flying_dinosaur {
+        width: 25px; /* уменьшаем в 2 раза */
+        height: 25px; /* уменьшаем в 2 раза */
+        position: absolute;
+        bottom: 162.5px; /* уменьшаем в 2 раза */
+        left: 475px; /* уменьшаем в 2 раза */
+        background-image: url("flying_dinosaur.png");
+        background-size: 25px 25px; /* уменьшаем в 2 раза */
+        animation: flying-dinosaur-rotate 5s linear infinite; /* Анимация вращения */
+      }
+
+      @keyframes cactus-block {
+        0% {
+          right: -10px; /* уменьшаем в 2 раза */
+        }
+        100% {
+          left: -10px; /* уменьшаем в 2 раза */
+        }
+      }
+
+      @keyframes flying_dinosaur-block {
+        0% {
+          right: -40px; /* уменьшаем в 2 раза */
+        }
+        100% {
+          left: -10px; /* уменьшаем в 2 раза */
+        }
+      }
+
+      @keyframes dino-block {
+        0% {
+          left: -5px; /* уменьшаем в 2 раза */
+        }
+        100% {
+          left: 200px; /* уменьшаем в 2 раза */
+        }
+      }
+
+      @keyframes flying-dinosaur-rotate {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body style="background-color: #afeeee">
+    <div class="game">
+      <div id="dino"></div>
+      <div id="cactus"></div>
+      <div id="flying_dinosaur"></div>
+    </div>
+
+    <script>
+      let isCactusAnimationRunning = false;
+      let isFlyingDinosaurAnimationRunning = false;
+      const cactus = document.getElementById("cactus");
+      const flying_dinosaur = document.getElementById("flying_dinosaur");
+      let cactusAnimationDuration = 2000;
+      let dinosaurAnimationDuration = 1300;
+      let jumpDuration = 500;
+
+      function startCactusAnimation() {
+        if (!isCactusAnimationRunning) {
+          isCactusAnimationRunning = true;
+          setTimeout(() => {
+            cactus.style.animation = `cactus-block ${
+              cactusAnimationDuration / 1000
+            }s linear infinite`;
+            setTimeout(() => {
+              cactus.style.animation = "none";
+              isCactusAnimationRunning = false;
+              startFlyingDinosaurAnimation();
+              cactusAnimationDuration -= 100;
+              jumpDuration -= 10;
+            }, cactusAnimationDuration);
+          }, jumpDuration);
+        }
+      }
+
+      function startFlyingDinosaurAnimation() {
+        if (!isFlyingDinosaurAnimationRunning) {
+          isFlyingDinosaurAnimationRunning = true;
+          setTimeout(() => {
+            flying_dinosaur.style.animation = `flying_dinosaur-block ${
+              dinosaurAnimationDuration / 1000
+            }s linear infinite, flying-dinosaur-rotate 0.5s linear infinite`; /* Добавление анимации вращения */
+            setTimeout(() => {
+              flying_dinosaur.style.animation = "none";
+              isFlyingDinosaurAnimationRunning = false;
+              startCactusAnimation();
+              dinosaurAnimationDuration -= 100;
+              jumpDuration -= 10;
+            }, dinosaurAnimationDuration);
+          }, jumpDuration);
+        }
+      }
+
+      startCactusAnimation();
+      const dino = document.getElementById("dino");
+      const scoreText = document.createElement("div");
+      let score = 0;
+
+      scoreText.style.position = "absolute";
+      scoreText.style.top = "10%";
+      scoreText.style.left = "50%";
+      scoreText.style.transform = "translate(-50%, -50%)";
+      scoreText.style.fontSize = "30px";
+      scoreText.style.fontWeight = "bold";
+      scoreText.style.color = "darkgreen";
+      scoreText.textContent = "Счет: 0";
+      scoreText.id = "score";
+      document.body.appendChild(scoreText);
+
+      function jump() {
+        if (dino.style.bottom !== "100px") {
+          dino.style.animation = `jump-animation 1000ms`; // Увеличиваем продолжительность прыжка
+          dino.style.bottom = "100px";
+          setTimeout(() => {
+            dino.style.bottom = "0";
+          }, 1000); // Увеличиваем задержку после прыжка
+        }
+      }
+
+      document.addEventListener("keydown", (event) => {
+        if (event.code === "Space") {
+          jump();
+        }
+      });
+
+      document.addEventListener("touchstart", () => {
+        jump();
+      });
+      window.setInterval(() => {
+        const dinoRect = dino.getBoundingClientRect();
+        const cactusRect = cactus.getBoundingClientRect();
+        const flyingDinosaurRect = flying_dinosaur.getBoundingClientRect();
+
+        if (
+          (dinoRect.right >= cactusRect.left &&
+            dinoRect.left <= cactusRect.right &&
+            dinoRect.bottom >= cactusRect.top &&
+            dinoRect.top <= cactusRect.bottom) ||
+          (dinoRect.right >= flyingDinosaurRect.left &&
+            dinoRect.left <= flyingDinosaurRect.right &&
+            dinoRect.bottom >= flyingDinosaurRect.top &&
+            dinoRect.top <= flyingDinosaurRect.bottom)
+        ) {
+          dino.style.animation = "none";
+          cactus.style.animation = "none";
+          flying_dinosaur.style.animation = "none";
+          isCactusAnimationRunning = false;
+          isFlyingDinosaurAnimationRunning = false;
+          alert("Игра окончена! Тупизна тупизной!!! Ваш счет: " + score);
+          window.location.reload();
+        } else {
+          score += 1;
+          scoreText.textContent = "Счет: " + score;
+        }
+      }, 10);
+
+      document.addEventListener("keydown", (event) => {
+        if (event.code === "Space") {
+          jump();
+        }
+      });
+    </script>
+
+    <div id="game-controls">
+      <div id="game-rules"></div>
+      <button onclick="restartGame()">Перезапустить</button>
+    </div>
+
+    <script>
+      function restartGame() {
+        window.location.reload();
+      }
+
+      const restartButton = document.querySelector("button");
+      restartButton.style.padding = "10px 20px";
+      restartButton.style.fontSize = "15px";
+      restartButton.style.fontWeight = "bold";
+      restartButton.style.color = "#afeeee";
+      restartButton.style.backgroundColor = "darkgreen";
+      restartButton.style.border = "none";
+      restartButton.style.borderRadius = "5px";
+      restartButton.style.cursor = "pointer";
+      restartButton.style.position = "absolute";
+      restartButton.style.bottom = "10px";
+      restartButton.style.left = "50%";
+      restartButton.style.transform = "translateX(-50%)";
+    </script>
+  </body>
+</html>
